@@ -3,10 +3,10 @@ package cmd
 import (
 	"fmt"
 	"strconv"
-
+	
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
-
+	
 	"github.com/iqlusioninc/relayer/relayer"
 )
 
@@ -24,31 +24,33 @@ func xfersend() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
+			
 			pth, err := cmd.Flags().GetString(flagPath)
 			if err != nil {
 				return err
 			}
-
+			
 			if _, err = setPathsFromArgs(c[src], c[dst], pth); err != nil {
 				return err
 			}
-
+			
 			amount, err := sdk.ParseCoin(args[2])
 			if err != nil {
 				return err
 			}
-
+			
 			source, err := strconv.ParseBool(args[3])
 			if err != nil {
 				return err
 			}
-
+			
+			done := c[dst].UseSDKContext()
 			dstAddr, err := sdk.AccAddressFromBech32(args[4])
 			if err != nil {
 				return err
 			}
-
+			done()
+			
 			return c[src].SendTransferMsg(c[dst], amount, dstAddr, source)
 		},
 	}
@@ -68,33 +70,33 @@ func transferCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
+			
 			pth, err := cmd.Flags().GetString(flagPath)
 			if err != nil {
 				return err
 			}
-
+			
 			if _, err = setPathsFromArgs(c[src], c[dst], pth); err != nil {
 				return err
 			}
-
+			
 			amount, err := sdk.ParseCoin(args[2])
 			if err != nil {
 				return err
 			}
-
+			
 			source, err := strconv.ParseBool(args[3])
 			if err != nil {
 				return err
 			}
-
+			
 			done := c[dst].UseSDKContext()
 			dstAddr, err := sdk.AccAddressFromBech32(args[4])
 			if err != nil {
 				return err
 			}
 			done()
-
+			
 			return c[src].SendTransferBothSides(c[dst], amount, dstAddr, source)
 		},
 	}
@@ -107,7 +109,7 @@ func setPathsFromArgs(src, dst *relayer.Chain, name string) (*relayer.Path, erro
 	if err != nil {
 		return nil, err
 	}
-
+	
 	// Given the number of args and the number of paths,
 	// work on the appropriate path
 	var path *relayer.Path
@@ -127,14 +129,14 @@ func setPathsFromArgs(src, dst *relayer.Chain, name string) (*relayer.Path, erro
 			path = v
 		}
 	}
-
+	
 	if err = src.SetPath(path.End(src.ChainID)); err != nil {
 		return nil, err
 	}
-
+	
 	if err = dst.SetPath(path.End(dst.ChainID)); err != nil {
 		return nil, err
 	}
-
+	
 	return path, nil
 }
