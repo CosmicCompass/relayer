@@ -249,8 +249,8 @@ func packetMsgFromTxQuery(src, dst *Chain, sh *SyncHeaders, seq uint64) (sdk.Msg
 	case tx.Count == 0:
 		// Not an error, just try again later.
 		return nil, nil
-	case tx.Count > 1:
-		return nil, fmt.Errorf("more than one transaction returned with query")
+	//case tx.Count > 1:  // TODO: mine ; mofiy this
+	//	return nil, fmt.Errorf("more than one transaction returned with query")
 	}
 
 	rlyPackets, err := relayPacketFromQueryResponse(src.PathEnd, dst.PathEnd, tx.Txs[0])
